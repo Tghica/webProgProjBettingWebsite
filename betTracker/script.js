@@ -1,73 +1,112 @@
 "use strict";
 
-const betForm = document.getElementById("betForm");
-const eventInput = document.getElementById("event");
-const marketInput = document.getElementById("market");
+const createBetForm = document.getElementById("createBetForm");
+const placeBetForm = document.getElementById("placeBetForm");
+const betNameInput = document.getElementById("betName");
 const stakeInput = document.getElementById("stake");
-const oddsInput = document.getElementById("odds");
+const outcomeInput = document.getElementById("outcome");
+
+const userMenuButton = document.getElementById("userMenuButton");
+const userList = document.getElementById("userList");
+
+const openPoolTotal = document.getElementById("openPoolTotal");
+const outcome1Pool = document.getElementById("outcome1Pool");
+const outcome2Pool = document.getElementById("outcome2Pool");
+const currentBetTitle = document.getElementById("currentBetTitle");
+
+const resolveOutcome1 = document.getElementById("resolveOutcome1");
+const resolveOutcome2 = document.getElementById("resolveOutcome2");
 
 const openBetsBody = document.getElementById("openBetsBody");
 const settledBetsBody = document.getElementById("settledBetsBody");
+const creditsBody = document.getElementById("creditsBody");
 
-const openStakeTotal = document.getElementById("openStakeTotal");
-const profitLossTotal = document.getElementById("profitLossTotal");
-const openBetsCount = document.getElementById("openBetsCount");
+const userNames = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5"];
+const userCredits = {
+  "Player 1": 100,
+  "Player 2": 100,
+  "Player 3": 100,
+  "Player 4": 100,
+  "Player 5": 100
+};
 
-let openBets = [
-  {
-    id: 1,
-    event: "Real Madrid vs Barcelona",
-    market: "Both Teams To Score",
-    stake: 20,
-    odds: 1.8
-  },
-  {
-    id: 2,
-    event: "Lakers vs Celtics",
-    market: "Lakers Moneyline",
-    stake: 15,
-    odds: 2.1
-  }
-];
-
+let activeUser = "Player 1";
+let currentBet = "";
+let openBets = [];
 let settledBets = [];
-let nextId = 3;
+let nextId = 1;
 
 function money(value) {
   return `$${value.toFixed(2)}`;
 }
 
+function getCurrentBetBets() {
+  const result = [];
+  for (let k = 0; k < openBets.length; k++) {
+    if (openBets[k].bet === currentBet) {
+      result.push(openBets[k]);
+    }
+  }
+  return result;
+}
+
+function poolForOutcome(outcomeName) {
+  const bets = getCurrentBetBets();
+  let total = 0;
+  for (let k = 0; k < bets.length; k++) {
+    if (bets[k].outcome === outcomeName) {
+      total += bets[k].stake;
+    }
+  }
+  return total;
+}
+
+function totalPool() {
+  const bets = getCurrentBetBets();
+  let total = 0;
+  for (let k = 0; k < bets.length; k++) {
+    total += bets[k].stake;
+  }
+  return total;
+}
+
+function renderSummary() {
+  if (!currentBet) {
+    currentBetTitle.textContent = "No active bet";
+    openPoolTotal.textContent = "$0.00";
+    outcome1Pool.textContent = "$0.00";
+    outcome2Pool.textContent = "$0.00";
+    return;
+  }
+
+  currentBetTitle.textContent = `Active bet: ${currentBet}`;
+  openPoolTotal.textContent = money(totalPool());
+  outcome1Pool.textContent = money(poolForOutcome("Outcome 1"));
+  outcome2Pool.textContent = money(poolForOutcome("Outcome 2"));
+}
+
 function renderOpenBets() {
   openBetsBody.innerHTML = "";
 
-  if (openBets.length === 0) {
+  const bets = getCurrentBetBets();
+  if (bets.length === 0) {
     const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="6" class="empty">No open bets.</td>';
+    row.innerHTML = '<td colspan="4" class="empty">No bets placed.</td>';
     openBetsBody.appendChild(row);
     return;
   }
 
-  openBets.forEach((bet) => {
+  for (let k = 0; k < bets.length; k++) {
+    const bet = bets[k];
     const row = document.createElement("tr");
-    const potentialReturn = bet.stake * bet.odds;
-
     row.innerHTML = `
-      <td>${bet.event}</td>
-      <td>${bet.market}</td>
+      <td>${bet.user}</td>
+      <td>${bet.bet}</td>
+      <td>${bet.outcome}</td>
       <td>${money(bet.stake)}</td>
-      <td>${bet.odds.toFixed(2)}</td>
-      <td>${money(potentialReturn)}</td>
-      <td>
-        <div class="action-buttons">
-          <button class="btn btn-win" data-id="${bet.id}" data-action="win">Win</button>
-          <button class="btn btn-loss" data-id="${bet.id}" data-action="loss">Loss</button>
-          <button class="btn btn-delete" data-id="${bet.id}" data-action="delete">Delete</button>
-        </div>
-      </td>
     `;
-
     openBetsBody.appendChild(row);
-  });
+  }
 }
 
 function renderSettledBets() {
@@ -75,111 +114,187 @@ function renderSettledBets() {
 
   if (settledBets.length === 0) {
     const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="4" class="empty">No settled bets.</td>';
+    row.innerHTML = '<td colspan="6" class="empty">No settled bets.</td>';
     settledBetsBody.appendChild(row);
     return;
   }
 
-  settledBets.forEach((bet) => {
+  for (let k = 0; k < settledBets.length; k++) {
+    const bet = settledBets[k];
     const row = document.createElement("tr");
-    const resultClass = bet.profit >= 0 ? "profit" : "loss";
     const sign = bet.profit >= 0 ? "+" : "";
+    const cssClass = bet.profit >= 0 ? "profit" : "loss";
     row.innerHTML = `
-      <td>${bet.event}</td>
-      <td>${bet.market}</td>
+      <td>${bet.user}</td>
+      <td>${bet.bet}</td>
+      <td>${bet.outcome}</td>
       <td>${bet.result}</td>
-      <td class="${resultClass}">${sign}${money(bet.profit)}</td>
+      <td>${money(bet.payout)}</td>
+      <td class="${cssClass}">${sign}${money(bet.profit)}</td>
     `;
     settledBetsBody.appendChild(row);
-  });
+  }
 }
 
-function updateSummary() {
-  const totalOpenStake = openBets.reduce((sum, bet) => sum + bet.stake, 0);
-  const totalProfitLoss = settledBets.reduce((sum, bet) => sum + bet.profit, 0);
+function renderCredits() {
+  creditsBody.innerHTML = "";
 
-  openStakeTotal.textContent = money(totalOpenStake);
-  profitLossTotal.textContent = `${totalProfitLoss >= 0 ? "+" : ""}${money(totalProfitLoss)}`;
-  profitLossTotal.className = `value ${totalProfitLoss >= 0 ? "profit" : "loss"}`;
-  openBetsCount.textContent = String(openBets.length);
+  for (let k = 0; k < userNames.length; k++) {
+    const userName = userNames[k];
+    const row = document.createElement("tr");
+    if (userName === activeUser) {
+      row.classList.add("active-user-row");
+    }
+    row.innerHTML = `
+      <td>${userName}</td>
+      <td>${money(userCredits[userName])}</td>
+    `;
+    creditsBody.appendChild(row);
+  }
 }
 
 function renderAll() {
+  renderSummary();
   renderOpenBets();
   renderSettledBets();
-  updateSummary();
+  renderCredits();
 }
 
-function addBet(event) {
+function createBet(event) {
   event.preventDefault();
+  const betName = betNameInput.value.trim();
 
-  const betEvent = eventInput.value.trim();
-  const market = marketInput.value.trim();
-  const stake = Number(stakeInput.value);
-  const odds = Number(oddsInput.value);
-
-  if (!betEvent || !market || stake <= 0 || odds <= 1) {
-    alert("Please fill all fields with valid values.");
+  if (!betName) {
+    alert("Please enter a bet name.");
     return;
   }
+
+  currentBet = betName;
+  betNameInput.value = "";
+  renderAll();
+}
+
+function placeBet(event) {
+  event.preventDefault();
+
+  if (!currentBet) {
+    alert("Create a bet first.");
+    return;
+  }
+
+  const stake = Number(stakeInput.value);
+  const outcome = outcomeInput.value;
+
+  if (stake <= 0) {
+    alert("Please enter a valid stake.");
+    return;
+  }
+
+  if (userCredits[activeUser] < stake) {
+    alert("Not enough credits for this user.");
+    return;
+  }
+
+  userCredits[activeUser] -= stake;
 
   openBets.push({
     id: nextId,
-    event: betEvent,
-    market,
-    stake,
-    odds
+    user: activeUser,
+    bet: currentBet,
+    outcome,
+    stake
   });
   nextId += 1;
 
-  betForm.reset();
+  placeBetForm.reset();
   renderAll();
 }
 
-function settleBet(id, result) {
-  const index = openBets.findIndex((bet) => bet.id === id);
-  if (index === -1) {
+function resolveBet(winningOutcome) {
+  if (!currentBet) {
+    alert("No active bet to resolve.");
     return;
   }
 
-  const bet = openBets[index];
-  openBets.splice(index, 1);
-
-  const profit = result === "Win" ? bet.stake * (bet.odds - 1) : -bet.stake;
-  settledBets.unshift({
-    id: bet.id,
-    event: bet.event,
-    market: bet.market,
-    result,
-    profit
-  });
-
-  renderAll();
-}
-
-function deleteBet(id) {
-  openBets = openBets.filter((bet) => bet.id !== id);
-  renderAll();
-}
-
-openBetsBody.addEventListener("click", (event) => {
-  const button = event.target.closest("button[data-action]");
-  if (!button) {
+  const bets = getCurrentBetBets();
+  if (bets.length === 0) {
+    alert("No bets placed for the active bet.");
     return;
   }
 
-  const id = Number(button.dataset.id);
-  const action = button.dataset.action;
+  let pool = 0;
+  let winnerPool = 0;
 
-  if (action === "win") {
-    settleBet(id, "Win");
-  } else if (action === "loss") {
-    settleBet(id, "Loss");
-  } else if (action === "delete") {
-    deleteBet(id);
+  for (let k = 0; k < bets.length; k++) {
+    pool += bets[k].stake;
+    if (bets[k].outcome === winningOutcome) {
+      winnerPool += bets[k].stake;
+    }
   }
-});
 
-betForm.addEventListener("submit", addBet);
+  for (let k = 0; k < bets.length; k++) {
+    const bet = bets[k];
+    let payout = 0;
+    let result = "Loss";
+
+    if (winnerPool > 0 && bet.outcome === winningOutcome) {
+      payout = pool * (bet.stake / winnerPool);
+      userCredits[bet.user] += payout;
+      result = "Win";
+    }
+
+    settledBets.unshift({
+      id: bet.id,
+      user: bet.user,
+      bet: bet.bet,
+      outcome: bet.outcome,
+      result,
+      payout,
+      profit: payout - bet.stake
+    });
+  }
+
+  const remaining = [];
+  for (let k = 0; k < openBets.length; k++) {
+    if (openBets[k].bet !== currentBet) {
+      remaining.push(openBets[k]);
+    }
+  }
+  openBets = remaining;
+
+  currentBet = "";
+  renderAll();
+}
+
+function onUserMenuClick() {
+  userList.classList.toggle("hidden");
+}
+
+function onUserListClick(event) {
+  const chosen = event.target.getAttribute("data-user");
+  if (!chosen) {
+    return;
+  }
+  activeUser = chosen;
+  userMenuButton.textContent = `User: ${activeUser}`;
+  userList.classList.add("hidden");
+  renderCredits();
+}
+
+function onResolveOutcome1() {
+  resolveBet("Outcome 1");
+}
+
+function onResolveOutcome2() {
+  resolveBet("Outcome 2");
+}
+
+createBetForm.addEventListener("submit", createBet);
+placeBetForm.addEventListener("submit", placeBet);
+resolveOutcome1.addEventListener("click", onResolveOutcome1);
+resolveOutcome2.addEventListener("click", onResolveOutcome2);
+
+userMenuButton.addEventListener("click", onUserMenuClick);
+userList.addEventListener("click", onUserListClick);
 
 renderAll();

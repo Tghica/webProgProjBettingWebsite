@@ -9,27 +9,43 @@
 </head>
 <body>
   <header class="top-bar">
-    <h1>betTracker</h1>
-    <p>Track your bets, results, and bankroll in one place.</p>
+    <div class="header-left">
+      <h1>betTracker</h1>
+      <p>Pari-mutuel betting tracker.</p>
+    </div>
+    <div class="user-menu" id="userMenu">
+      <button type="button" id="userMenuButton">User: Player 1</button>
+      <div class="user-list hidden" id="userList">
+        <p data-user="Player 1">Player 1</p>
+        <p data-user="Player 2">Player 2</p>
+        <p data-user="Player 3">Player 3</p>
+        <p data-user="Player 4">Player 4</p>
+        <p data-user="Player 5">Player 5</p>
+      </div>
+    </div>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>Add Bet</h2>
-      <form id="betForm" class="bet-form">
-        <label for="event">Event</label>
-        <input id="event" type="text" placeholder="Arsenal vs Liverpool" required />
+      <h2>Create Bet</h2>
+      <form id="createBetForm" class="bet-form">
+        <p>Bet Name</p>
+        <input id="betName" type="text" placeholder="Team A vs Team B" />
+        <button type="submit">Create Bet</button>
+      </form>
 
-        <label for="market">Market</label>
-        <input id="market" type="text" placeholder="Home Win" required />
+      <h2 class="sub-title">Place Bet</h2>
+      <form id="placeBetForm" class="bet-form">
+        <p>Stake</p>
+        <input id="stake" type="number" placeholder="50" />
 
-        <label for="stake">Stake</label>
-        <input id="stake" type="number" min="0.01" step="0.01" placeholder="25" required />
+        <p>Outcome</p>
+        <select id="outcome">
+          <option value="Outcome 1">Outcome 1</option>
+          <option value="Outcome 2">Outcome 2</option>
+        </select>
 
-        <label for="odds">Odds</label>
-        <input id="odds" type="number" min="1.01" step="0.01" placeholder="1.85" required />
-
-        <button type="submit">Save Bet</button>
+        <button type="submit">Place Bet For Active User</button>
       </form>
     </section>
 
@@ -37,32 +53,54 @@
       <h2>Bankroll Summary</h2>
       <div class="summary-grid">
         <div>
-          <p class="label">Open Stakes</p>
-          <p id="openStakeTotal" class="value">$0.00</p>
+          <p class="label">Current Pool</p>
+          <p id="openPoolTotal" class="value">$0.00</p>
         </div>
         <div>
-          <p class="label">Settled P/L</p>
-          <p id="profitLossTotal" class="value">$0.00</p>
+          <p class="label">Outcome 1 Pool</p>
+          <p id="outcome1Pool" class="value">$0.00</p>
         </div>
         <div>
-          <p class="label">Open Bets</p>
-          <p id="openBetsCount" class="value">0</p>
+          <p class="label">Outcome 2 Pool</p>
+          <p id="outcome2Pool" class="value">$0.00</p>
         </div>
       </div>
     </section>
 
     <section class="card">
-      <h2>Open Bets</h2>
+      <h2>Current Bet</h2>
+      <p id="currentBetTitle" class="label">No active bet</p>
+      <div class="action-buttons">
+        <button type="button" class="btn btn-win" id="resolveOutcome1">Resolve Outcome 1</button>
+        <button type="button" class="btn btn-loss" id="resolveOutcome2">Resolve Outcome 2</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>User Credits</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Event</th>
-              <th>Market</th>
+              <th>User</th>
+              <th>Credits</th>
+            </tr>
+          </thead>
+          <tbody id="creditsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Placed Bets</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Bet</th>
+              <th>Outcome</th>
               <th>Stake</th>
-              <th>Odds</th>
-              <th>Potential Return</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="openBetsBody"></tbody>
@@ -76,9 +114,11 @@
         <table>
           <thead>
             <tr>
-              <th>Event</th>
-              <th>Market</th>
+              <th>User</th>
+              <th>Bet</th>
+              <th>Outcome</th>
               <th>Result</th>
+              <th>Payout</th>
               <th>P/L</th>
             </tr>
           </thead>
