@@ -1,42 +1,50 @@
-const bets = [
-  { event: "Real Madrid vs Barca", stake: 20, odds: 1.75 },
-  { event: "Lakers vs Celtics", stake: 15, odds: 2.1 }
-];
+"use strict";
 
-const eventInput = document.getElementById("event");
-const stakeInput = document.getElementById("stake");
-const oddsInput = document.getElementById("odds");
-const saveButton = document.querySelector("button");
-const openBetsList = document.getElementById("openBets");
+const element = document.querySelector(".myElement");
+element.textContent = "Hello World";
 
-function renderBets() {
-  openBetsList.innerHTML = "";
-
-  bets.forEach((bet) => {
-    const item = document.createElement("li");
-    item.textContent = `${bet.event} - Stake: $${bet.stake} - Odds: ${bet.odds}`;
-    openBetsList.appendChild(item);
-  });
+for (let k = 0; k < 20; k++) {
+  element.textContent += " Hello World";
 }
 
-function addBet() {
-  const event = eventInput.value.trim();
-  const stake = Number(stakeInput.value);
-  const odds = Number(oddsInput.value);
+const redBox = document.getElementById("redBox");
+const yellowBox = document.getElementById("yellowBox");
+const eventLog = document.getElementById("eventLog");
 
-  if (!event || stake <= 0 || odds <= 0) {
-    alert("Please enter valid event, stake, and odds.");
-    return;
-  }
-
-  bets.push({ event, stake, odds });
-  renderBets();
-
-  eventInput.value = "";
-  stakeInput.value = "";
-  oddsInput.value = "";
+function addLogLine(text) {
+  const line = document.createElement("p");
+  line.textContent = text;
+  eventLog.appendChild(line);
 }
 
-saveButton.addEventListener("click", addBet);
+redBox.addEventListener("click", function actionClickRedBox() {
+  addLogLine("Red !");
+});
 
-renderBets();
+yellowBox.addEventListener("click", function actionClickYellowBox() {
+  addLogLine("Yellow !");
+});
+
+const shape = document.getElementById("shape");
+const clickCircle = document.getElementById("clickCircle");
+const clickSquare = document.getElementById("clickSquare");
+const clickRed = document.getElementById("clickRed");
+const clickYellow = document.getElementById("clickYellow");
+
+clickCircle.addEventListener("click", function applyCircle() {
+  shape.classList.add("circle");
+});
+
+clickSquare.addEventListener("click", function applySquare() {
+  shape.classList.remove("circle");
+});
+
+clickRed.addEventListener("click", function applyRed() {
+  shape.classList.add("red");
+  shape.classList.remove("yellow");
+});
+
+clickYellow.addEventListener("click", function applyYellow() {
+  shape.classList.add("yellow");
+  shape.classList.remove("red");
+});
