@@ -4,15 +4,15 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f6f7f9;
-  color: #1c1c1c;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f3f5f9;
+  color: #1f2937;
 }
 
 .top-bar {
-  background: #2f4f4f;
+  background: linear-gradient(120deg, #0f172a, #1d4ed8);
   color: #ffffff;
-  padding: 24px;
+  padding: 28px 20px;
   text-align: center;
 }
 
@@ -26,8 +26,8 @@ body {
 }
 
 .container {
-  max-width: 980px;
-  margin: 20px auto;
+  max-width: 1080px;
+  margin: 24px auto;
   padding: 0 16px 24px;
   display: grid;
   gap: 16px;
@@ -35,88 +35,150 @@ body {
 
 .card {
   background: #ffffff;
-  border: 1px solid #d9d9d9;
-  border-radius: 10px;
-  padding: 16px;
+  border: 1px solid #d7deea;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
 }
 
-.myElement {
-  min-height: 48px;
-  padding: 10px;
-  background: #f0f4ff;
-  border-radius: 6px;
+h2 {
+  margin: 0 0 14px;
 }
 
-.box-row {
-  display: flex;
-  gap: 16px;
-  margin: 12px 0;
+.bet-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 14px;
 }
 
-.event-box {
-  width: 120px;
-  height: 90px;
-  border: 2px solid #000000;
+.bet-form label {
+  font-size: 0.92rem;
+  color: #475569;
+}
+
+.bet-form input {
+  width: 100%;
+  border: 1px solid #c7d2e4;
   border-radius: 8px;
+  padding: 10px;
+  margin-top: 4px;
+}
+
+.bet-form button {
+  grid-column: 1 / -1;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 14px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.red-box {
-  background-color: red;
+.bet-form button:hover {
+  background: #1d4ed8;
 }
 
-.red-box:hover {
-  background-color: lightsalmon;
-}
-
-.yellow-box {
-  background-color: yellow;
-}
-
-.yellow-box:hover {
-  background-color: lightyellow;
-}
-
-.event-log {
-  min-height: 40px;
-}
-
-.event-log p {
-  margin: 4px 0;
-}
-
-.controls {
+.summary-grid {
   display: flex;
+  gap: 14px;
   flex-wrap: wrap;
-  gap: 8px;
 }
 
-button {
-  border: 1px solid #8f8f8f;
+.summary-grid > div {
+  flex: 1;
+  min-width: 180px;
+  background: #eef4ff;
+  border: 1px solid #d7e4ff;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.label {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.value {
+  margin: 6px 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 8px;
+  white-space: nowrap;
+}
+
+th {
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.btn {
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 6px 9px;
   background: #ffffff;
   cursor: pointer;
+  font-size: 0.84rem;
 }
 
-button:hover {
-  background: #ececec;
+.btn:hover {
+  background: #f8fafc;
 }
 
-.shape {
-  margin-top: 16px;
-  width: 200px;
-  height: 200px;
+.btn-win {
+  border-color: #86efac;
+  color: #166534;
 }
 
-.circle {
-  border-radius: 50%;
+.btn-loss {
+  border-color: #fda4af;
+  color: #9f1239;
 }
 
-.red {
-  background-color: red;
+.btn-delete {
+  border-color: #cbd5e1;
+  color: #334155;
 }
 
-.yellow {
-  background-color: yellow;
+.profit {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.loss {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.empty {
+  color: #64748b;
+  font-style: italic;
+}
+
+@media (max-width: 780px) {
+  .bet-form {
+    grid-template-columns: 1fr;
+  }
 }

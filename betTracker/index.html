@@ -3,41 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Course Content Demo</title>
+  <title>betTracker</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
 <body>
   <header class="top-bar">
-    <h1>Course Content Demo</h1>
-    <p>HTML DOM, Events, and CSS Class Modifications</p>
+    <h1>betTracker</h1>
+    <p>Track your bets, results, and bankroll in one place.</p>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>1) DOM Access</h2>
-      <p class="myElement"></p>
+      <h2>Add Bet</h2>
+      <form id="betForm" class="bet-form">
+        <label for="event">Event</label>
+        <input id="event" type="text" placeholder="Arsenal vs Liverpool" required />
+
+        <label for="market">Market</label>
+        <input id="market" type="text" placeholder="Home Win" required />
+
+        <label for="stake">Stake</label>
+        <input id="stake" type="number" min="0.01" step="0.01" placeholder="25" required />
+
+        <label for="odds">Odds</label>
+        <input id="odds" type="number" min="1.01" step="0.01" placeholder="1.85" required />
+
+        <button type="submit">Save Bet</button>
+      </form>
+    </section>
+
+    <section class="card summary">
+      <h2>Bankroll Summary</h2>
+      <div class="summary-grid">
+        <div>
+          <p class="label">Open Stakes</p>
+          <p id="openStakeTotal" class="value">$0.00</p>
+        </div>
+        <div>
+          <p class="label">Settled P/L</p>
+          <p id="profitLossTotal" class="value">$0.00</p>
+        </div>
+        <div>
+          <p class="label">Open Bets</p>
+          <p id="openBetsCount" class="value">0</p>
+        </div>
+      </div>
     </section>
 
     <section class="card">
-      <h2>2) Event Exercise</h2>
-      <p>Click a box to add a line with the selected color.</p>
-      <div class="box-row">
-        <div class="event-box red-box" id="redBox"></div>
-        <div class="event-box yellow-box" id="yellowBox"></div>
+      <h2>Open Bets</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Market</th>
+              <th>Stake</th>
+              <th>Odds</th>
+              <th>Potential Return</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="openBetsBody"></tbody>
+        </table>
       </div>
-      <div id="eventLog" class="event-log"></div>
     </section>
 
     <section class="card">
-      <h2>3) CSS Class Toggle</h2>
-      <div class="controls">
-        <button type="button" id="clickCircle">Circle</button>
-        <button type="button" id="clickSquare">Square</button>
-        <button type="button" id="clickRed">Red</button>
-        <button type="button" id="clickYellow">Yellow</button>
+      <h2>Settled Bets</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Market</th>
+              <th>Result</th>
+              <th>P/L</th>
+            </tr>
+          </thead>
+          <tbody id="settledBetsBody"></tbody>
+        </table>
       </div>
-      <div id="shape" class="shape circle red"></div>
     </section>
   </main>
 </body>
