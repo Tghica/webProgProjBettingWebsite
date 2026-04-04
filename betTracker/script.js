@@ -6,8 +6,7 @@ const betNameInput = document.getElementById("betName");
 const stakeInput = document.getElementById("stake");
 const outcomeInput = document.getElementById("outcome");
 
-const userMenuButton = document.getElementById("userMenuButton");
-const userList = document.getElementById("userList");
+const userPicker = document.getElementById("userPicker");
 
 const openPoolTotal = document.getElementById("openPoolTotal");
 const outcome1Pool = document.getElementById("outcome1Pool");
@@ -22,21 +21,16 @@ const openBetsBody = document.getElementById("openBetsBody");
 const settledBetsBody = document.getElementById("settledBetsBody");
 const creditsBody = document.getElementById("creditsBody");
 
-const userNames = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5"];
-const userCredits = {
-  "Player 1": 100,
-  "Player 2": 100,
-  "Player 3": 100,
-  "Player 4": 100,
-  "Player 5": 100
-};
+const userNames = [];
+const userCredits = {};
 
-let activeUser = "Player 1";
+let activeUser = "";
 let activeBets = [];
 let selectedBet = "";
 let openBets = [];
 let settledBets = [];
 let nextId = 1;
+let nextPlayerNumber = 1;
 
 function money(value) {
   return `$${value.toFixed(2)}`;
@@ -159,6 +153,13 @@ function renderSettledBets() {
 function renderCredits() {
   creditsBody.innerHTML = "";
 
+  if (userNames.length === 0) {
+    const row = document.createElement("tr");
+    row.innerHTML = '<td colspan="2" class="empty">No players yet. Press + to add one.</td>';
+    creditsBody.appendChild(row);
+    return;
+  }
+
   for (let k = 0; k < userNames.length; k++) {
     const userName = userNames[k];
     const row = document.createElement("tr");
@@ -173,8 +174,43 @@ function renderCredits() {
   }
 }
 
+function renderUserPicker() {
+  userPicker.innerHTML = "";
+
+  if (userNames.length === 0) {
+    const hint = document.createElement("p");
+    hint.className = "user-picker-hint";
+    hint.textContent = "No players. Press + to add one.";
+    userPicker.appendChild(hint);
+  }
+
+  for (let k = 0; k < userNames.length; k++) {
+    const userName = userNames[k];
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = userName;
+    button.setAttribute("data-user", userName);
+    button.className = "user-chip";
+
+    if (userName === activeUser) {
+      button.classList.add("active");
+    }
+
+    userPicker.appendChild(button);
+  }
+
+  const addButton = document.createElement("button");
+  addButton.type = "button";
+  addButton.textContent = "+";
+  addButton.setAttribute("data-action", "add-user");
+  addButton.setAttribute("aria-label", "Add player");
+  addButton.className = "user-chip user-chip-add";
+  userPicker.appendChild(addButton);
+}
+
 function renderAll() {
   renderActiveBetOptions();
+  renderUserPicker();
   renderSummary();
   renderOpenBets();
   renderSettledBets();
@@ -211,6 +247,11 @@ function placeBet(event) {
 
   if (!selectedBet) {
     alert("Create and select a bet first.");
+    return;
+  }
+
+  if (!activeUser) {
+    alert("Add and select a player first.");
     return;
   }
 
@@ -317,18 +358,29 @@ function onActiveBetChange(event) {
   renderOpenBets();
 }
 
-function onUserMenuClick() {
-  userList.classList.toggle("hidden");
-}
+function onUserPickerClick(event) {
+  const action = event.target.getAttribute("data-action");
+  if (action === "add-user") {
+    const newUser = `Player ${nextPlayerNumber}`;
+    nextPlayerNumber += 1;
 
-function onUserListClick(event) {
+    userNames.push(newUser);
+    userCredits[newUser] = 100;
+    activeUser = newUser;
+
+    renderUserPicker();
+    renderCredits();
+    return;
+  }
+
   const chosen = event.target.getAttribute("data-user");
   if (!chosen) {
     return;
   }
+
   activeUser = chosen;
-  userMenuButton.textContent = `User: ${activeUser}`;
-  userList.classList.add("hidden");
+
+  renderUserPicker();
   renderCredits();
 }
 
@@ -345,8 +397,6 @@ placeBetForm.addEventListener("submit", placeBet);
 resolveOutcome1.addEventListener("click", onResolveOutcome1);
 resolveOutcome2.addEventListener("click", onResolveOutcome2);
 activeBetSelect.addEventListener("change", onActiveBetChange);
-
-userMenuButton.addEventListener("click", onUserMenuClick);
-userList.addEventListener("click", onUserListClick);
+userPicker.addEventListener("click", onUserPickerClick);
 
 renderAll();

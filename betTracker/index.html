@@ -13,16 +13,6 @@
       <h1>betTracker</h1>
       <p>Pari-mutuel betting tracker.</p>
     </div>
-    <div class="user-menu" id="userMenu">
-      <button type="button" id="userMenuButton">User: Player 1</button>
-      <div class="user-list hidden" id="userList">
-        <p data-user="Player 1">Player 1</p>
-        <p data-user="Player 2">Player 2</p>
-        <p data-user="Player 3">Player 3</p>
-        <p data-user="Player 4">Player 4</p>
-        <p data-user="Player 5">Player 5</p>
-      </div>
-    </div>
   </header>
 
   <main class="container">
@@ -35,6 +25,7 @@
       </form>
 
       <h2 class="sub-title">Place Bet</h2>
+      <div class="user-picker" id="userPicker" role="group" aria-label="Select active user"></div>
       <form id="placeBetForm" class="bet-form">
         <p>Stake</p>
         <input id="stake" type="number" placeholder="50" />
