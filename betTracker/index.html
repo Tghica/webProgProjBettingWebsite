@@ -69,7 +69,13 @@
 
     <section class="card">
       <h2>Current Bet</h2>
-      <p id="currentBetTitle" class="label">No active bet</p>
+      <p id="currentBetTitle" class="label">No active bet selected</p>
+      <div class="active-bet-controls">
+        <p>Active Bet</p>
+        <select id="activeBetSelect">
+          <option value="">Select a bet</option>
+        </select>
+      </div>
       <div class="action-buttons">
         <button type="button" class="btn btn-win" id="resolveOutcome1">Resolve Outcome 1</button>
         <button type="button" class="btn btn-loss" id="resolveOutcome2">Resolve Outcome 2</button>

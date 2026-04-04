@@ -13,6 +13,7 @@ const openPoolTotal = document.getElementById("openPoolTotal");
 const outcome1Pool = document.getElementById("outcome1Pool");
 const outcome2Pool = document.getElementById("outcome2Pool");
 const currentBetTitle = document.getElementById("currentBetTitle");
+const activeBetSelect = document.getElementById("activeBetSelect");
 
 const resolveOutcome1 = document.getElementById("resolveOutcome1");
 const resolveOutcome2 = document.getElementById("resolveOutcome2");
@@ -31,7 +32,8 @@ const userCredits = {
 };
 
 let activeUser = "Player 1";
-let currentBet = "";
+let activeBets = [];
+let selectedBet = "";
 let openBets = [];
 let settledBets = [];
 let nextId = 1;
@@ -42,12 +44,30 @@ function money(value) {
 
 function getCurrentBetBets() {
   const result = [];
+  if (!selectedBet) {
+    return result;
+  }
   for (let k = 0; k < openBets.length; k++) {
-    if (openBets[k].bet === currentBet) {
+    if (openBets[k].bet === selectedBet) {
       result.push(openBets[k]);
     }
   }
   return result;
+}
+
+function renderActiveBetOptions() {
+  activeBetSelect.innerHTML = '<option value="">Select a bet</option>';
+
+  for (let k = 0; k < activeBets.length; k++) {
+    const name = activeBets[k];
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    if (name === selectedBet) {
+      option.selected = true;
+    }
+    activeBetSelect.appendChild(option);
+  }
 }
 
 function poolForOutcome(outcomeName) {
@@ -71,15 +91,15 @@ function totalPool() {
 }
 
 function renderSummary() {
-  if (!currentBet) {
-    currentBetTitle.textContent = "No active bet";
+  if (!selectedBet) {
+    currentBetTitle.textContent = "No active bet selected";
     openPoolTotal.textContent = "$0.00";
     outcome1Pool.textContent = "$0.00";
     outcome2Pool.textContent = "$0.00";
     return;
   }
 
-  currentBetTitle.textContent = `Active bet: ${currentBet}`;
+  currentBetTitle.textContent = `Active bet: ${selectedBet}`;
   openPoolTotal.textContent = money(totalPool());
   outcome1Pool.textContent = money(poolForOutcome("Outcome 1"));
   outcome2Pool.textContent = money(poolForOutcome("Outcome 2"));
@@ -154,6 +174,7 @@ function renderCredits() {
 }
 
 function renderAll() {
+  renderActiveBetOptions();
   renderSummary();
   renderOpenBets();
   renderSettledBets();
@@ -169,7 +190,18 @@ function createBet(event) {
     return;
   }
 
-  currentBet = betName;
+  for (let k = 0; k < activeBets.length; k++) {
+    if (activeBets[k].toLowerCase() === betName.toLowerCase()) {
+      selectedBet = activeBets[k];
+      betNameInput.value = "";
+      renderAll();
+      alert("This bet already exists. It has been selected as active.");
+      return;
+    }
+  }
+
+  activeBets.push(betName);
+  selectedBet = betName;
   betNameInput.value = "";
   renderAll();
 }
@@ -177,8 +209,8 @@ function createBet(event) {
 function placeBet(event) {
   event.preventDefault();
 
-  if (!currentBet) {
-    alert("Create a bet first.");
+  if (!selectedBet) {
+    alert("Create and select a bet first.");
     return;
   }
 
@@ -200,7 +232,7 @@ function placeBet(event) {
   openBets.push({
     id: nextId,
     user: activeUser,
-    bet: currentBet,
+    bet: selectedBet,
     outcome,
     stake
   });
@@ -211,14 +243,14 @@ function placeBet(event) {
 }
 
 function resolveBet(winningOutcome) {
-  if (!currentBet) {
-    alert("No active bet to resolve.");
+  if (!selectedBet) {
+    alert("No selected bet to resolve.");
     return;
   }
 
   const bets = getCurrentBetBets();
   if (bets.length === 0) {
-    alert("No bets placed for the active bet.");
+    alert("No bets placed for the selected bet.");
     return;
   }
 
@@ -256,14 +288,33 @@ function resolveBet(winningOutcome) {
 
   const remaining = [];
   for (let k = 0; k < openBets.length; k++) {
-    if (openBets[k].bet !== currentBet) {
+    if (openBets[k].bet !== selectedBet) {
       remaining.push(openBets[k]);
     }
   }
   openBets = remaining;
 
-  currentBet = "";
+  const keepActive = [];
+  for (let k = 0; k < activeBets.length; k++) {
+    if (activeBets[k] !== selectedBet) {
+      keepActive.push(activeBets[k]);
+    }
+  }
+  activeBets = keepActive;
+
+  if (activeBets.length > 0) {
+    selectedBet = activeBets[0];
+  } else {
+    selectedBet = "";
+  }
+
   renderAll();
+}
+
+function onActiveBetChange(event) {
+  selectedBet = event.target.value;
+  renderSummary();
+  renderOpenBets();
 }
 
 function onUserMenuClick() {
@@ -293,6 +344,7 @@ createBetForm.addEventListener("submit", createBet);
 placeBetForm.addEventListener("submit", placeBet);
 resolveOutcome1.addEventListener("click", onResolveOutcome1);
 resolveOutcome2.addEventListener("click", onResolveOutcome2);
+activeBetSelect.addEventListener("change", onActiveBetChange);
 
 userMenuButton.addEventListener("click", onUserMenuClick);
 userList.addEventListener("click", onUserListClick);
